@@ -10,7 +10,7 @@ We zijn van plan een tamagotchi te maken, hierbij worden dan de soorten tamagotc
 
 ### Backend repo's
 * [PlayerData Microservice (MongoDB)](https://github.com/A-Van-Gestel/3APP01-APT-Back_PlayerData_Microservice)
-* [Types Tomagotchi Microservice (MariaDB)](https://github.com/A-Van-Gestel/3APP01-APT-Back_TypesTomagotchi_Microservice)
+* [Types Tomagotchi Microservice (MariaDB)](https://github.com/stenneyrinck/3APP01-APT-Back_TypesTomagotchi_Microservice)
 
 ### Diagram van de volledige microservices architectuur
 todo...
