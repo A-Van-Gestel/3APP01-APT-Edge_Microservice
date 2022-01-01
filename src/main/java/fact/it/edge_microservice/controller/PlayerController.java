@@ -43,6 +43,12 @@ public class PlayerController {
 
         assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println(playerData.getTypeName());
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
+
             ResponseEntity<TypeTamagotchi> responseEntityTypeTamagotchi =
                     restTemplate.exchange("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
                             HttpMethod.GET, null, new ParameterizedTypeReference<TypeTamagotchi>() {}, playerData.getTypeName());
