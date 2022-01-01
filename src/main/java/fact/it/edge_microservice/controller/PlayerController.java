@@ -12,7 +12,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @RestController
@@ -103,46 +105,59 @@ public class PlayerController {
     }
 
 
-//    @PostMapping("/player")
-//    public Player addPlayer(@RequestParam Integer userId, @RequestParam String ISBN, @RequestParam Integer score){
-//
-//        PlayerData playerData =
-//                restTemplate.postForObject("http://" + playerDataServiceBaseUrl + "/playerDatas",
-//                        new PlayerData(userId,ISBN,score),PlayerData.class);
-//
-//        TypeTamagotchi typeTamagotchi =
-//                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/typeTamagotchis/{ISBN}",
-//                        TypeTamagotchi.class,ISBN);
-//
-//        return new Player(typeTamagotchi, playerData);
-//    }
-//
-//    @PutMapping("/rankings")
-//    public Player updateRanking(@RequestParam Integer userId, @RequestParam String ISBN, @RequestParam Integer score){
-//
-//        PlayerData playerData =
-//                restTemplate.getForObject("http://" + playerDataServiceBaseUrl + "/playerDatas/user/" + userId + "/typeTamagotchi/" + ISBN,
-//                        PlayerData.class);
-//        playerData.setScoreNumber(score);
-//
-//        ResponseEntity<PlayerData> responseEntityPlayerData =
-//                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerDatas",
-//                        HttpMethod.PUT, new HttpEntity<>(playerData), PlayerData.class);
-//
-//        PlayerData retrievedPlayerData = responseEntityPlayerData.getBody();
-//
-//        TypeTamagotchi typeTamagotchi =
-//                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/typeTamagotchis/{ISBN}",
-//                        TypeTamagotchi.class,ISBN);
-//
-//        return new Player(typeTamagotchi, retrievedPlayerData);
-//    }
-//
-//    @DeleteMapping("/rankings/{userId}/typeTamagotchi/{ISBN}")
-//    public ResponseEntity deleteRanking(@PathVariable Integer userId, @PathVariable String ISBN){
-//
-//        restTemplate.delete("http://" + playerDataServiceBaseUrl + "/playerDatas/user/" + userId + "/typeTamagotchi/" + ISBN);
-//
-//        return ResponseEntity.ok().build();
-//    }
+    // Create a new player with given playerDataCode, typeName & TamagotchiName, return the player
+    @PostMapping("/player")
+    public Player addPlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name){
+
+        LocalDateTime dateTime = LocalDateTime.now();
+
+        PlayerData playerData =
+                restTemplate.postForObject("http://" + playerDataServiceBaseUrl + "/playerData",
+                        new PlayerData(playerDataCode, typeName, name, 100, 100, dateTime, dateTime, 0), PlayerData.class);
+
+        TypeTamagotchi typeTamagotchi =
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
+                        TypeTamagotchi.class, typeName);
+
+
+        assert playerData != null;
+        assert typeTamagotchi != null;
+        return new Player(playerData, typeTamagotchi);
+    }
+
+
+    // Allow the player to update their tamagotchi's name, return the player object
+    @PutMapping("/player")
+    public Player updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name){
+
+        PlayerData playerData =
+                restTemplate.getForObject("http://" + playerDataServiceBaseUrl + "/playerData/" + playerDataCode,
+                        PlayerData.class);
+        assert playerData != null;
+        playerData.setName(name);
+
+        ResponseEntity<PlayerData> responseEntityPlayerData =
+                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerData",
+                        HttpMethod.PUT, new HttpEntity<>(playerData), PlayerData.class);
+
+        PlayerData retrievedPlayerData = responseEntityPlayerData.getBody();
+
+        TypeTamagotchi typeTamagotchi =
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
+                        TypeTamagotchi.class, typeName);
+
+        assert retrievedPlayerData != null;
+        assert typeTamagotchi != null;
+        return new Player(retrievedPlayerData, typeTamagotchi);
+    }
+
+
+    // Allow the player to delete their player and progress made
+    @DeleteMapping("/player/{playerDataCode}")
+    public ResponseEntity<Object> deleteRanking(@PathVariable Integer playerDataCode){
+
+        restTemplate.delete("http://" + playerDataServiceBaseUrl + "/playerData/" + playerDataCode);
+
+        return ResponseEntity.ok().build();
+    }
 }
