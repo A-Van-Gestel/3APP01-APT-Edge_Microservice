@@ -8,9 +8,9 @@ import lombok.Setter;
 public class PlayerTamagotchi {
 
     private String playerDataId;
-    private Integer typeTamagotchiId;
+    private int typeTamagotchiId;
 
-    public PlayerTamagotchi(String playerDataId, Integer typeTamagotchiId) {
+    public PlayerTamagotchi(String playerDataId, int typeTamagotchiId) {
         this.playerDataId = playerDataId;
         this.typeTamagotchiId = typeTamagotchiId;
     }
