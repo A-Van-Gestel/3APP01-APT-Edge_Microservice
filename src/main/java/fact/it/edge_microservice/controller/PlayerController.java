@@ -28,9 +28,6 @@ public class PlayerController {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private final String playerDataServiceURL = "http://" + playerDataServiceBaseUrl;
-    private final String typeTamagotchiServiceURL = "http://" + typeTamagotchiServiceBaseUrl;
-
     // Get all players
     @GetMapping("/players")
     public List<Player> getAllPlayers(){
@@ -38,7 +35,7 @@ public class PlayerController {
         List<Player> returnList = new ArrayList<>();
 
         ResponseEntity<List<PlayerData>> responseEntityPlayerDatas =
-                restTemplate.exchange(playerDataServiceURL + "/playerDatas",
+                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerDatas",
                         HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
                         });
 
@@ -47,7 +44,7 @@ public class PlayerController {
         assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
             TypeTamagotchi typeTamagotchi =
-                    restTemplate.getForObject(typeTamagotchiServiceURL + "/types/name/{typeName}",
+                    restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
             assert typeTamagotchi != null;
@@ -63,7 +60,7 @@ public class PlayerController {
     public Player getPlayerByPlayerDataCode(@PathVariable String playerDataCode){
 
         ResponseEntity<PlayerData> responseEntityPlayerDatas =
-                restTemplate.exchange(playerDataServiceURL + "/playerData/{playerDataCode}",
+                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerData/{playerDataCode}",
                         HttpMethod.GET, null, new ParameterizedTypeReference<PlayerData>() {
                         }, playerDataCode);
 
@@ -71,7 +68,7 @@ public class PlayerController {
 
         assert playerData != null;
         TypeTamagotchi typeTamagotchi =
-                restTemplate.getForObject(typeTamagotchiServiceURL + "/types/name/{typeName}",
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
                         TypeTamagotchi.class, playerData.getTypeName());
 
         assert typeTamagotchi != null;
@@ -86,7 +83,7 @@ public class PlayerController {
         List<Player> returnList = new ArrayList<>();
 
         ResponseEntity<List<PlayerData>> responseEntityPlayerDatas =
-                restTemplate.exchange(playerDataServiceURL + "/playerDatas/type/{typeName}",
+                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerDatas/type/{typeName}",
                         HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
                         }, typeName);
 
@@ -95,7 +92,7 @@ public class PlayerController {
         assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
             TypeTamagotchi typeTamagotchi =
-                    restTemplate.getForObject(typeTamagotchiServiceURL + "/types/name/{typeName}",
+                    restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
             assert typeTamagotchi != null;
@@ -113,11 +110,11 @@ public class PlayerController {
         LocalDateTime dateTime = LocalDateTime.now();
 
         PlayerData playerData =
-                restTemplate.postForObject(playerDataServiceURL + "/playerData",
+                restTemplate.postForObject("http://" + playerDataServiceBaseUrl + "/playerData",
                         new PlayerData(playerDataCode, typeName, name, 100, 100, dateTime, dateTime, 0), PlayerData.class);
 
         TypeTamagotchi typeTamagotchi =
-                restTemplate.getForObject(typeTamagotchiServiceURL + "/types/{typeName}",
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, typeName);
 
 
@@ -132,19 +129,19 @@ public class PlayerController {
     public Player updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name){
 
         PlayerData playerData =
-                restTemplate.getForObject(playerDataServiceURL + "/playerData/" + playerDataCode,
+                restTemplate.getForObject("http://" + playerDataServiceBaseUrl + "/playerData/" + playerDataCode,
                         PlayerData.class);
         assert playerData != null;
         playerData.setName(name);
 
         ResponseEntity<PlayerData> responseEntityPlayerData =
-                restTemplate.exchange(playerDataServiceURL + "/playerData",
+                restTemplate.exchange("http://" + playerDataServiceBaseUrl + "/playerData",
                         HttpMethod.PUT, new HttpEntity<>(playerData), PlayerData.class);
 
         PlayerData retrievedPlayerData = responseEntityPlayerData.getBody();
 
         TypeTamagotchi typeTamagotchi =
-                restTemplate.getForObject(typeTamagotchiServiceURL + "/types/{typeName}",
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, typeName);
 
         assert retrievedPlayerData != null;
@@ -157,7 +154,7 @@ public class PlayerController {
     @DeleteMapping("/player/{playerDataCode}")
     public ResponseEntity<Object> deleteRanking(@PathVariable Integer playerDataCode){
 
-        restTemplate.delete(playerDataServiceURL + "/playerData/" + playerDataCode);
+        restTemplate.delete("http://" + playerDataServiceBaseUrl + "/playerData/" + playerDataCode);
 
         return ResponseEntity.ok().build();
     }
