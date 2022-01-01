@@ -44,7 +44,7 @@ public class PlayerController {
         assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
             System.out.println("-----------------------------------------------------------------------------------------");
-            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------playerData.getTypeName()------------------------------------");
             System.out.println(playerData.getTypeName());
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("-----------------------------------------------------------------------------------------");
@@ -53,8 +53,22 @@ public class PlayerController {
                     restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("---------------------------------typeTamagotchi------------------------------------------");
+            System.out.println(typeTamagotchi);
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
+
             assert typeTamagotchi != null;
-            returnList.add(new Player(playerData, typeTamagotchi));
+            Player playerToAdd = new Player(playerData, typeTamagotchi);
+
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("------------------------------------playerToAdd------------------------------------------");
+            System.out.println(playerToAdd);
+            System.out.println("-----------------------------------------------------------------------------------------");
+            System.out.println("-----------------------------------------------------------------------------------------");
+
+            returnList.add(playerToAdd);
         }
 
         return returnList;
