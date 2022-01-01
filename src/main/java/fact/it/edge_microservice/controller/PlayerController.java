@@ -49,11 +49,9 @@ public class PlayerController {
             System.out.println("-----------------------------------------------------------------------------------------");
             System.out.println("-----------------------------------------------------------------------------------------");
 
-            ResponseEntity<TypeTamagotchi> responseEntityTypeTamagotchi =
-                    restTemplate.exchange("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
-                            HttpMethod.GET, null, new ParameterizedTypeReference<TypeTamagotchi>() {}, playerData.getTypeName());
-
-            TypeTamagotchi typeTamagotchi = responseEntityTypeTamagotchi.getBody();
+            TypeTamagotchi typeTamagotchi =
+                    restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
+                            TypeTamagotchi.class, playerData.getTypeName());
 
             assert typeTamagotchi != null;
             returnList.add(new Player(playerData, typeTamagotchi));
@@ -76,7 +74,7 @@ public class PlayerController {
 
         assert playerData != null;
         TypeTamagotchi typeTamagotchi =
-                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
+                restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, playerData.getTypeName());
 
         assert typeTamagotchi != null;
@@ -100,7 +98,7 @@ public class PlayerController {
         assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
             TypeTamagotchi typeTamagotchi =
-                    restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/name/{typeName}",
+                    restTemplate.getForObject("http://" + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
             assert typeTamagotchi != null;
