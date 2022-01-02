@@ -30,6 +30,8 @@ public class PlayerController {
     private String typeTamagotchiServiceBaseUrl;
 
     private static final String URL_PROTOCOL = "http://";
+    private static final String PATTERN_LETTERS_AND_DIGITS = "^[a-zA-Z0-9]+$";
+    private static final String PATTERN_LETTERS = "^[a-zA-Z]+$";
 
     // Get all players
     @GetMapping("/players")
@@ -44,7 +46,6 @@ public class PlayerController {
 
         List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
 
-        // assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
 
             TypeTamagotchi typeTamagotchi =
@@ -93,7 +94,6 @@ public class PlayerController {
 
         List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
 
-        // assert playerDatas != null;
         for (PlayerData playerData: playerDatas) {
             TypeTamagotchi typeTamagotchi =
                     restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
@@ -131,9 +131,9 @@ public class PlayerController {
 
         // Check to validate if the user input is valid
         if (
-                !playerDataCode.matches("[a-zA-Z0-9]+") && // Restrict the playerDataCode to letters and digits only
-                !typeName.matches("[a-zA-Z]+") &&          // Restrict the typeName to letters only
-                !name.matches("[a-zA-Z0-9]+")              // Restrict the name to letters and digits only
+                !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) && // Restrict the playerDataCode to letters and digits only
+                !typeName.matches(PATTERN_LETTERS) &&          // Restrict the typeName to letters only
+                !name.matches(PATTERN_LETTERS_AND_DIGITS)              // Restrict the name to letters and digits only
         )
         {
             throw new IOException();
@@ -166,7 +166,7 @@ public class PlayerController {
 
         // Check to validate if the user input is valid
         if (
-            !playerDataCode.matches("[a-zA-Z0-9]+") // Restrict the playerDataCode to letters and digits only
+            !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) // Restrict the playerDataCode to letters and digits only
         )
         {
             throw new IOException();
