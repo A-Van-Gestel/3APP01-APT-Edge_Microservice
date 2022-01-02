@@ -18,13 +18,13 @@ public class Player {
         setName(playerData.getName());
         setPlayerDataCode(playerData.getPlayerDataCode());
         playerTamagotchis = new ArrayList<>();
-        playerTamagotchis.add(new PlayerTamagotchi(playerData.getId(), typeTamagotchi.getId()));
+        playerTamagotchis.add(new PlayerTamagotchi(playerData, typeTamagotchi));
         setPlayerTamagotchis(playerTamagotchis);
     }
 
-    public List<PlayerTamagotchi> addTamagotchi(String playerDataId, Integer typeTamagotchiId) {
+    public List<PlayerTamagotchi> addTamagotchi(PlayerData playerData, TypeTamagotchi typeTamagotchi) {
         playerTamagotchis = getPlayerTamagotchis();
-        playerTamagotchis.add(new PlayerTamagotchi(playerDataId, typeTamagotchiId));
+        playerTamagotchis.add(new PlayerTamagotchi(playerData, typeTamagotchi));
         setPlayerTamagotchis(playerTamagotchis);
 
         return playerTamagotchis;

@@ -7,11 +7,11 @@ import lombok.Setter;
 @Setter
 public class PlayerTamagotchi {
 
-    private String playerDataId;
-    private int typeTamagotchiId;
+    private PlayerData playerData;
+    private TypeTamagotchi typeTamagotchi;
 
-    public PlayerTamagotchi(String playerDataId, int typeTamagotchiId) {
-        this.playerDataId = playerDataId;
-        this.typeTamagotchiId = typeTamagotchiId;
+    public PlayerTamagotchi(PlayerData playerData, TypeTamagotchi typeTamagotchi) {
+        this.playerData = playerData;
+        this.typeTamagotchi = typeTamagotchi;
     }
 }
