@@ -19,10 +19,6 @@ public class TypeTamagotchi {
     public TypeTamagotchi() {
     }
 
-    public TypeTamagotchi(String typeName) {
-        this.typeName = typeName;
-    }
-
     public TypeTamagotchi(String typeName, String description, int maxWeight, int minWeight, int minHealth, int neuroticism, int metabolism, int minHappiness) {
         this.typeName = typeName;
         this.description = description;
