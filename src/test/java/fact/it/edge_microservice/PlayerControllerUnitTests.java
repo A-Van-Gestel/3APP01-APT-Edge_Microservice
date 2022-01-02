@@ -37,7 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class PlayerControllerUnitTests {
+class PlayerControllerUnitTests {
 
     @Autowired
     private RestTemplate restTemplate;
@@ -83,7 +83,7 @@ public class PlayerControllerUnitTests {
     }
 
     @Test
-    public void whenGetPlayers_thenReturnPlayersJson() throws Exception {
+    void whenGetPlayers_thenReturnPlayersJson() throws Exception {
 
         // GET all playerData from playerDataCode '12345abcde'
         mockServer.expect(ExpectedCount.once(),
@@ -196,7 +196,7 @@ public class PlayerControllerUnitTests {
 
 
     @Test
-    public void whenGetPlayerByPlayerDataCode_thenReturnPlayerJson() throws Exception {
+    void whenGetPlayerByPlayerDataCode_thenReturnPlayerJson() throws Exception {
 
         // GET all playerData from playerDataCode '12345abcde'
         mockServer.expect(ExpectedCount.once(),
@@ -245,7 +245,7 @@ public class PlayerControllerUnitTests {
     }
 
     @Test
-    public void whenGetPlayerByTypeTamagotchi_thenReturnPlayerJson() throws Exception {
+    void whenGetPlayerByTypeTamagotchi_thenReturnPlayerJson() throws Exception {
 
         // GET all playerData from playerDataCode '12345abcde'
         mockServer.expect(ExpectedCount.once(),
