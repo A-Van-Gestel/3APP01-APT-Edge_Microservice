@@ -21,12 +21,4 @@ public class Player {
         playerTamagotchis.add(new PlayerTamagotchi(playerData, typeTamagotchi));
         setPlayerTamagotchis(playerTamagotchis);
     }
-
-    public List<PlayerTamagotchi> addTamagotchi(PlayerData playerData, TypeTamagotchi typeTamagotchi) {
-        playerTamagotchis = getPlayerTamagotchis();
-        playerTamagotchis.add(new PlayerTamagotchi(playerData, typeTamagotchi));
-        setPlayerTamagotchis(playerTamagotchis);
-
-        return playerTamagotchis;
-    }
 }
