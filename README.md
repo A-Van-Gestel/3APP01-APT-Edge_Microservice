@@ -1,6 +1,6 @@
 # 3APP01 | APT | Edge Microservice
 
-
+[![Quality Gate Status](https://sonarcloud.io/api/project_badges/measure?project=A-Van-Gestel_3APP01-APT-Back_PlayerData_Microservice&metric=alert_status)](https://sonarcloud.io/summary/new_code?id=A-Van-Gestel_3APP01-APT-Edge_Microservice)
 [![Bugs](https://sonarcloud.io/api/project_badges/measure?project=A-Van-Gestel_3APP01-APT-Edge_Microservice&metric=bugs)](https://sonarcloud.io/summary/new_code?id=A-Van-Gestel_3APP01-APT-Edge_Microservice)
 [![Code Smells](https://sonarcloud.io/api/project_badges/measure?project=A-Van-Gestel_3APP01-APT-Edge_Microservice&metric=code_smells)](https://sonarcloud.io/summary/new_code?id=A-Van-Gestel_3APP01-APT-Edge_Microservice)
 [![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=A-Van-Gestel_3APP01-APT-Edge_Microservice&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=A-Van-Gestel_3APP01-APT-Edge_Microservice)
