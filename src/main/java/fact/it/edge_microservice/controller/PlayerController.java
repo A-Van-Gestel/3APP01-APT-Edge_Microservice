@@ -51,7 +51,6 @@ public class PlayerController {
                     restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
-            // assert typeTamagotchi != null;
             Player playerToAdd = new Player(playerData, typeTamagotchi);
 
             returnList.add(playerToAdd);
@@ -72,12 +71,11 @@ public class PlayerController {
 
         PlayerData playerData = responseEntityPlayerDatas.getBody();
 
-        // assert playerData != null;
+        assert playerData != null;
         TypeTamagotchi typeTamagotchi =
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, playerData.getTypeName());
 
-        // assert typeTamagotchi != null;
         return new Player(playerData, typeTamagotchi);
     }
 
@@ -101,7 +99,6 @@ public class PlayerController {
                     restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
-            // assert typeTamagotchi != null;
             returnList.add(new Player(playerData, typeTamagotchi));
         }
 
@@ -124,8 +121,6 @@ public class PlayerController {
                         TypeTamagotchi.class, typeName);
 
 
-        // assert playerData != null;
-        // assert typeTamagotchi != null;
         return new Player(playerData, typeTamagotchi);
     }
 
@@ -147,7 +142,8 @@ public class PlayerController {
         PlayerData playerData =
                 restTemplate.getForObject(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode,
                         PlayerData.class);
-        // assert playerData != null;
+
+        assert playerData != null;
         playerData.setName(name);
 
         ResponseEntity<PlayerData> responseEntityPlayerData =
@@ -160,8 +156,6 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, typeName);
 
-        // assert retrievedPlayerData != null;
-        // assert typeTamagotchi != null;
         return new Player(retrievedPlayerData, typeTamagotchi);
     }
 
