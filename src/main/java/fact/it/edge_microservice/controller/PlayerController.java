@@ -29,7 +29,7 @@ public class PlayerController {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private final String urlProtocol = "http://";
+    private static final String urlProtocol = "http://";
 
     // Get all players
     @GetMapping("/players")
