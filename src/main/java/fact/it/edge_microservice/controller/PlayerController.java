@@ -136,8 +136,8 @@ public class PlayerController {
 
         // Check to validate if the user input is valid
         if (
-                !playerDataCode.matches("[a-zA-Z0-9]+") || // Restrict the playerDataCode to letters and digits only
-                !typeName.matches("[a-zA-Z]+") ||          // Restrict the typeName to letters only
+                !playerDataCode.matches("[a-zA-Z0-9]+") && // Restrict the playerDataCode to letters and digits only
+                !typeName.matches("[a-zA-Z]+") &&          // Restrict the typeName to letters only
                 !name.matches("[a-zA-Z0-9]+")              // Restrict the name to letters and digits only
         )
         {
@@ -168,7 +168,7 @@ public class PlayerController {
 
     // Allow the player to delete their player and progress made
     @DeleteMapping("/player/{playerDataCode}")
-    public ResponseEntity<Object> deleteRanking(@PathVariable Integer playerDataCode){
+    public ResponseEntity<Object> deletePlayer(@PathVariable String playerDataCode){
 
         restTemplate.delete(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode);
 

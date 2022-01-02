@@ -31,9 +31,8 @@ import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -121,7 +120,7 @@ class PlayerControllerUnitTests {
                         .body(mapper.writeValueAsString(type3))
                 );
 
-        mockMvc.perform(get("/players", 0))
+        mockMvc.perform(get("/players"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 // Array length is correct
@@ -216,7 +215,7 @@ class PlayerControllerUnitTests {
                         .body(mapper.writeValueAsString(type1))
                 );
 
-        mockMvc.perform(get("/player/12345abcde", 1))
+        mockMvc.perform(get("/player/{playerDataCode}", "12345abcde"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 // player is correct
@@ -265,7 +264,7 @@ class PlayerControllerUnitTests {
                         .body(mapper.writeValueAsString(type1))
                 );
 
-        mockMvc.perform(get("/players/type/Slijmie", 1))
+        mockMvc.perform(get("/players/type/{typeName}", "Slijmie"))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
                 // Array length is correct
@@ -293,5 +292,143 @@ class PlayerControllerUnitTests {
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.neuroticism",is(32)))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.metabolism",is(80)))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
+    }
+
+
+
+
+
+    @Test
+    void whenAddPlayer_thenReturnPlayerJson() throws Exception {
+
+        // Would never be the same because of the LocalDateTime.now() on POST
+        LocalDateTime dateTime = LocalDateTime.now();
+        PlayerData playerDataToPost = new PlayerData("player123post", "Slijmie", "Posted Slijm", 100, 100, dateTime, dateTime, 0);
+
+        // POST new user
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData")))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playerDataToPost))
+                );
+
+        // GET TypeTamagotchi with typeName 'Slijmie'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Slijmie")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(type1))
+                );
+
+        mockMvc.perform(post("/player")
+                        .param("playerDataCode", "player123post")
+                        .param("typeName", "Slijmie")
+                        .param("name", "Posted Slijm")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // player is correct
+                .andExpect(jsonPath("$.name", is("Posted Slijm")))
+                .andExpect(jsonPath("$.playerDataCode", is("player123post")))
+
+                // playerData1 is correct
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.playerDataCode",is("player123post")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.name",is("Posted Slijm")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.health",is(100)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.happiness",is(100)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.lastFed").exists())
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.lastPetted").exists())
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.age",is(0)))
+
+                // type1 is correct
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.description",is("Een slijmerig maar schattig dier")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.maxWeight",is(160)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minWeight",is(80)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHealth",is(50)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.neuroticism",is(32)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.metabolism",is(80)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
+    }
+
+    @Test
+    void whenUpdatePlayer_thenReturnPlayerJson() throws Exception {
+
+        PlayerData playerDataToPost = new PlayerData("12345abcde","Slijmie","PUT Slijm", 80, 50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
+
+        // GET playerData for playerDataCode '12345abcde'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/12345abcde")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playerData1))
+                );
+
+        // PUT playerData with playerDataCode '12345abcde'; update the name to "PUT Slijm"
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData")))
+                .andExpect(method(HttpMethod.PUT))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playerDataToPost))
+                );
+
+        // GET TypeTamagotchi with typeName 'Slijmie'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Slijmie")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(type1))
+                );
+
+        mockMvc.perform(put("/player")
+                        .param("playerDataCode", "12345abcde")
+                        .param("typeName", "Slijmie")
+                        .param("name", "PUT Slijm")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // player is correct
+                .andExpect(jsonPath("$.name", is("PUT Slijm")))
+                .andExpect(jsonPath("$.playerDataCode", is("12345abcde")))
+
+                // playerData1 is correct
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.playerDataCode",is("12345abcde")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.name",is("PUT Slijm")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.health",is(80)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.happiness",is(50)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.lastFed",is("2017-02-13T15:56:42")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.lastPetted",is("2017-02-13T15:56:05")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].playerData.age",is(30)))
+
+                // type1 is correct
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.description",is("Een slijmerig maar schattig dier")))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.maxWeight",is(160)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minWeight",is(80)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHealth",is(50)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.neuroticism",is(32)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.metabolism",is(80)))
+                .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
+    }
+
+    @Test
+    void whenDeleteRanking_thenReturnStatusOk() throws Exception {
+
+        // DELETE playerData for player with playerDataCode 'theDeletedOne999'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/theDeletedOne999")))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        mockMvc.perform(delete("/player/{playerDataCode}", "theDeletedOne999"))
+                .andExpect(status().isOk());
     }
 }
