@@ -1,5 +1,6 @@
 package fact.it.edge_microservice.config;
 
+import com.google.common.base.Predicates;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import springfox.documentation.builders.ApiInfoBuilder;
@@ -19,7 +20,7 @@ public class SwaggerConfig {
                 .apiInfo(apiInfo())
                 .select()
                 .apis(RequestHandlerSelectors.any())
-                .paths(PathSelectors.regex("/error.*").negate())
+                .paths(Predicates.not(PathSelectors.regex("/error.*")))
                 .build();
     }
 
