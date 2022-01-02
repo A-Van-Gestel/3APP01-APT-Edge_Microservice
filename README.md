@@ -18,7 +18,17 @@ We zijn van plan een tamagotchi te maken, hierbij worden dan de soorten tamagotc
 
 ### Backend repo's
 * [PlayerData Microservice (MongoDB)](https://github.com/A-Van-Gestel/3APP01-APT-Back_PlayerData_Microservice)
-* [Types Tomagotchi Microservice (MariaDB)](https://github.com/stenneyrinck/3APP01-APT-Back_TypesTomagotchi_Microservice)
+* [Types Tamagotchi Microservice (MariaDB)](https://github.com/stenneyrinck/3APP01-APT-Back_TypesTomagotchi_Microservice)
+
+### Kubernetes Service URL's
+Opent de Swagger-UI pagina van elke service, elke service draait in de cloud via Okteto.
+* [Edge Microservice](https://edge-service-server-a-van-gestel.cloud.okteto.net/swagger-ui.html)
+* [PlayerData Microservice (MongoDB)](https://playerdata-service-server-a-van-gestel.cloud.okteto.net/swagger-ui.html)
+* [Types Tamagotchi Microservice (MariaDB)](https://type-tamagotchi-service-server-a-van-gestel.cloud.okteto.net/swagger-ui.html)
+
+### Swagger-UI output Edge Microservice
+![swagger-ui-edge](docs/img/swagger-ui-edge.png)
+![swagger-ui-edge-output](docs/img/swagger-ui-edge-output.png)
 
 ### Diagram van de volledige microservices architectuur
-todo...
+![diagram](docs/img/Overview.png)
