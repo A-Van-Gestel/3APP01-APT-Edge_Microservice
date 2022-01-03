@@ -127,7 +127,7 @@ public class PlayerController {
 
     // Allow the player to update their tamagotchi's name, return the player object
     @PutMapping("/player")
-    public Player updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name) throws IOException {
+    public ResponseEntity<Player> updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name) throws IOException {
 
         // Check to validate if the user input is valid
         if (
@@ -143,7 +143,10 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode,
                         PlayerData.class);
 
-        assert playerData != null;
+        if (playerData == null) {
+            throw new NullPointerException();
+        }
+
         playerData.setName(name);
 
         ResponseEntity<PlayerData> responseEntityPlayerData =
@@ -156,7 +159,7 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, typeName);
 
-        return new Player(retrievedPlayerData, typeTamagotchi);
+        return ResponseEntity.ok().body(new Player(retrievedPlayerData, typeTamagotchi));
     }
 
 
