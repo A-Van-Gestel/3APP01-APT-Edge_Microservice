@@ -71,8 +71,7 @@ class PlayerControllerUnitTests {
     // --- TypeTamagotchi mock data ---
     private final TypeTamagotchi type1 = new TypeTamagotchi("Slijmie","Een slijmerig maar schattig dier",160,80,50,32,80,30);
     private final TypeTamagotchi type2 = new TypeTamagotchi("Slakkie","Een slak",120,70,60,98,120,40);
-    private final TypeTamagotchi type3 = new TypeTamagotchi(
-            "Fluffy","Een pluisbol",160,80,50,32,80,30);
+    private final TypeTamagotchi type3 = new TypeTamagotchi("Fluffy","Een pluisbol",160,80,50,32,80,30);
 
     List<TypeTamagotchi> typeList = Arrays.asList(type1, type2, type3);
 
