@@ -1,5 +1,6 @@
 package fact.it.edge_microservice.controller;
 
+import fact.it.edge_microservice.exception.BadArgumentsException;
 import fact.it.edge_microservice.model.Player;
 import fact.it.edge_microservice.model.PlayerData;
 import fact.it.edge_microservice.model.TypeTamagotchi;
@@ -30,6 +31,7 @@ public class PlayerController {
     private String typeTamagotchiServiceBaseUrl;
 
     private static final String URL_PROTOCOL = "http://";
+    private static final String PATTERN_LETTERS_AND_DIGITS_AND_SPACES = "^[a-zA-Z0-9 ]+$";
     private static final String PATTERN_LETTERS_AND_DIGITS = "^[a-zA-Z0-9]+$";
     private static final String PATTERN_LETTERS = "^[a-zA-Z]+$";
 
@@ -153,12 +155,17 @@ public class PlayerController {
 
         // Check to validate if the user input is valid
         if (
-                !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) && // Restrict the playerDataCode to letters and digits only
-                !typeName.matches(PATTERN_LETTERS) &&          // Restrict the typeName to letters only
-                !name.matches(PATTERN_LETTERS_AND_DIGITS)              // Restrict the name to letters and digits only
-        )
-        {
-            throw new IOException();
+                !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) // Restrict the playerDataCode to letters and digits only
+        ) {
+            throw new BadArgumentsException("playerDataCode parameter contains bad characters. Only letters and digits are allowed.");
+        } else if (
+                !typeName.matches(PATTERN_LETTERS) // Restrict the typeName to letters only
+        ) {
+            throw new BadArgumentsException("typeName parameter contains bad characters. Only letters are allowed.");
+        } else if (
+                !name.matches(PATTERN_LETTERS_AND_DIGITS_AND_SPACES) // Restrict the name to letters and digits and spaces only      // Restrict the typeName to letters only
+        ) {
+            throw new BadArgumentsException("name parameter contains bad characters. Only letters, digits and spaces are allowed.");
         }
 
         PlayerData playerData =
@@ -184,14 +191,13 @@ public class PlayerController {
 
     // Allow the player to delete their player and progress made
     @DeleteMapping("/player/{playerDataCode}")
-    public ResponseEntity<Object> deletePlayer(@PathVariable String playerDataCode) throws IOException {
+    public ResponseEntity<Object> deletePlayer(@PathVariable String playerDataCode) {
 
         // Check to validate if the user input is valid
         if (
-            !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) // Restrict the playerDataCode to letters and digits only
-        )
-        {
-            throw new IOException();
+                !playerDataCode.matches(PATTERN_LETTERS_AND_DIGITS) // Restrict the playerDataCode to letters and digits only
+        ) {
+            throw new BadArgumentsException("playerDataCode parameter contains bad characters. Only letters and digits are allowed.");
         }
 
         restTemplate.delete(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode);

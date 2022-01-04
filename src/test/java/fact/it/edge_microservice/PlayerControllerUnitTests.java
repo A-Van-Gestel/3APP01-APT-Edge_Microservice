@@ -5,8 +5,10 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
+import fact.it.edge_microservice.exception.BadArgumentsException;
 import fact.it.edge_microservice.model.PlayerData;
 import fact.it.edge_microservice.model.TypeTamagotchi;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +27,12 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.collection.IsCollectionWithSize.hasSize;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.method;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.requestTo;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
@@ -519,9 +524,9 @@ class PlayerControllerUnitTests {
                 );
 
         mockMvc.perform(put("/player")
-                        .param("playerDataCode", "12345abcde")
-                        .param("typeName", "Slijmie")
-                        .param("name", "PUT Slijm")
+                        .param("playerDataCode", playerDataToPost.getPlayerDataCode())
+                        .param("typeName", playerDataToPost.getTypeName())
+                        .param("name", playerDataToPost.getName())
                         .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk())
@@ -550,6 +555,55 @@ class PlayerControllerUnitTests {
                 .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
     }
 
+
+    @Test
+    void whenUpdatePlayerBadPlayerDataCode_thenReturnFilledException() throws Exception {
+
+        PlayerData playerDataToPost = new PlayerData("12345@abcde","Slijmie","PUT Slijm", 80, 50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
+
+        mockMvc.perform(put("/player")
+                        .param("playerDataCode", playerDataToPost.getPlayerDataCode())
+                        .param("typeName", playerDataToPost.getTypeName())
+                        .param("name", playerDataToPost.getName())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+                .andExpect(result -> assertEquals("playerDataCode parameter contains bad characters. Only letters and digits are allowed.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+    }
+
+
+    @Test
+    void whenUpdatePlayerBadTypeName_thenReturnFilledException() throws Exception {
+
+        PlayerData playerDataToPost = new PlayerData("12345abcde","Slijmie123","PUT Slijm", 80, 50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
+
+        mockMvc.perform(put("/player")
+                        .param("playerDataCode", playerDataToPost.getPlayerDataCode())
+                        .param("typeName", playerDataToPost.getTypeName())
+                        .param("name", playerDataToPost.getName())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+                .andExpect(result -> assertEquals("typeName parameter contains bad characters. Only letters are allowed.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+    }
+
+
+    @Test
+    void whenUpdatePlayerBadName_thenReturnFilledException() throws Exception {
+
+        PlayerData playerDataToPost = new PlayerData("12345abcde","Slijmie","PUT Slijm@123", 80, 50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
+
+        mockMvc.perform(put("/player")
+                        .param("playerDataCode", playerDataToPost.getPlayerDataCode())
+                        .param("typeName", playerDataToPost.getTypeName())
+                        .param("name", playerDataToPost.getName())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+                .andExpect(result -> assertEquals("name parameter contains bad characters. Only letters, digits and spaces are allowed.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+    }
+
+
     @Test
     void whenDeleteRanking_thenReturnStatusOk() throws Exception {
 
@@ -561,5 +615,21 @@ class PlayerControllerUnitTests {
 
         mockMvc.perform(delete("/player/{playerDataCode}", "theDeletedOne999"))
                 .andExpect(status().isOk());
+    }
+
+
+    @Test
+    void whenDeleteRankingBadPlayerDataCode_thenReturnStatusOk() throws Exception {
+
+        // DELETE playerData for player with playerDataCode 'theDeletedOne999'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/theDeletedOne999")))
+                .andExpect(method(HttpMethod.DELETE))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        mockMvc.perform(delete("/player/{playerDataCode}", "theDeletedOne999 @"))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+                .andExpect(result -> assertEquals("playerDataCode parameter contains bad characters. Only letters and digits are allowed.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 }
