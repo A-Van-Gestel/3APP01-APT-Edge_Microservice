@@ -67,7 +67,7 @@ public class PlayerController {
                         HttpMethod.GET, null, new ParameterizedTypeReference<PlayerData>() {
                         }, playerDataCode);
 
-        PlayerData playerData = responseEntityPlayerDatas.getBody();
+        PlayerData playerData = Objects.requireNonNull(responseEntityPlayerDatas.getBody());
 
 
         TypeTamagotchi typeTamagotchi =
