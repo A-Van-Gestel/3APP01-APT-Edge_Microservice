@@ -115,14 +115,11 @@ public class PlayerController {
         List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
 
         for (PlayerData playerData: playerDatas) {
-            if (alive && playerData.getHealth() > 0) {
+            if (
+                    (Boolean.TRUE.equals(alive) && playerData.getHealth() > 0) ||
+                    (Boolean.FALSE.equals(alive) && playerData.getHealth() <= 0)
+            ) {
                 Player playerToAdd = getPlayerToAdd(playerData);
-
-                returnList.add(playerToAdd);
-            }
-            else if (!alive && playerData.getHealth() <= 0) {
-                Player playerToAdd = getPlayerToAdd(playerData);
-
                 returnList.add(playerToAdd);
             }
         }
