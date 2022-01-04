@@ -8,7 +8,6 @@ import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import fact.it.edge_microservice.exception.BadArgumentsException;
 import fact.it.edge_microservice.model.PlayerData;
 import fact.it.edge_microservice.model.TypeTamagotchi;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
