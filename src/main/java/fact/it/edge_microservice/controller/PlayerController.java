@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 public class PlayerController {
@@ -69,12 +70,12 @@ public class PlayerController {
 
         PlayerData playerData = responseEntityPlayerDatas.getBody();
 
-        assert playerData != null;
+
         TypeTamagotchi typeTamagotchi =
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, playerData.getTypeName());
 
-        return new Player(playerData, typeTamagotchi);
+        return new Player(Objects.requireNonNull(playerData), Objects.requireNonNull(typeTamagotchi));
     }
 
 
@@ -96,7 +97,7 @@ public class PlayerController {
                     restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                             TypeTamagotchi.class, playerData.getTypeName());
 
-            returnList.add(new Player(playerData, typeTamagotchi));
+            returnList.add(new Player(Objects.requireNonNull(playerData), Objects.requireNonNull(typeTamagotchi)));
         }
 
         return returnList;
@@ -145,13 +146,13 @@ public class PlayerController {
                         TypeTamagotchi.class, typeName);
 
 
-        return new Player(playerData, typeTamagotchi);
+        return new Player(Objects.requireNonNull(playerData), Objects.requireNonNull(typeTamagotchi));
     }
 
 
     // Allow the player to update their tamagotchi's name, return the player object
     @PutMapping("/player")
-    public Player updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name) throws IOException {
+    public Player updatePlayer(@RequestParam String playerDataCode, @RequestParam String typeName, @RequestParam String name) {
 
         // Check to validate if the user input is valid
         if (
@@ -172,7 +173,12 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode,
                         PlayerData.class);
 
-        assert playerData != null;
+        if (playerData != null){
+            playerData.setName(name);
+        } else{
+            throw new BadArgumentsException("PlayerData with this playerDataCode doesn't exist");
+        }
+
         playerData.setName(name);
 
         ResponseEntity<PlayerData> responseEntityPlayerData =
@@ -185,7 +191,7 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, typeName);
 
-        return new Player(retrievedPlayerData, typeTamagotchi);
+        return new Player(Objects.requireNonNull(retrievedPlayerData), Objects.requireNonNull(typeTamagotchi));
     }
 
 
@@ -210,6 +216,6 @@ public class PlayerController {
                 restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
                         TypeTamagotchi.class, playerData.getTypeName());
 
-        return new Player(playerData, typeTamagotchi);
+        return new Player(Objects.requireNonNull(playerData), Objects.requireNonNull(typeTamagotchi));
     }
 }

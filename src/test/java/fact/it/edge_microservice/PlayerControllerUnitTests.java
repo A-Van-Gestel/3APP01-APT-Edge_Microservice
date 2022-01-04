@@ -249,6 +249,7 @@ class PlayerControllerUnitTests {
                 .andExpect(jsonPath("$.playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
     }
 
+
     @Test
     void whenGetPlayerByTypeTamagotchi_thenReturnPlayerJson() throws Exception {
 
@@ -601,6 +602,28 @@ class PlayerControllerUnitTests {
                 .andExpect(status().isBadRequest())
                 .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
                 .andExpect(result -> assertEquals("name parameter contains bad characters. Only letters, digits and spaces are allowed.", Objects.requireNonNull(result.getResolvedException()).getMessage()));
+    }
+
+
+    @Test
+    void whenUpdatePlayerPlayerDataNull_thenReturnFilledException() throws Exception {
+
+        PlayerData playerDataToPost = new PlayerData("doesntExist","Slijmie","PUT Slijm", 80, 50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
+
+        // GET playerData for playerDataCode 'doesntExist'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataToPost.getPlayerDataCode())))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK));
+
+        mockMvc.perform(put("/player")
+                        .param("playerDataCode", playerDataToPost.getPlayerDataCode())
+                        .param("typeName", playerDataToPost.getTypeName())
+                        .param("name", playerDataToPost.getName())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isBadRequest())
+                .andExpect(result -> assertTrue(result.getResolvedException() instanceof BadArgumentsException))
+                .andExpect(result -> assertEquals("PlayerData with this playerDataCode doesn't exist", Objects.requireNonNull(result.getResolvedException()).getMessage()));
     }
 
 
