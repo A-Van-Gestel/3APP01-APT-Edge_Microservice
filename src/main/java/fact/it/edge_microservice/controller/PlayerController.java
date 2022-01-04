@@ -46,7 +46,7 @@ public class PlayerController {
                         HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
                         });
 
-        List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
+        List<PlayerData> playerDatas = Objects.requireNonNull(responseEntityPlayerDatas.getBody());
 
         for (PlayerData playerData: playerDatas) {
             Player playerToAdd = getPlayerToAdd(playerData);
@@ -89,7 +89,7 @@ public class PlayerController {
                         HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
                         }, typeName);
 
-        List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
+        List<PlayerData> playerDatas = Objects.requireNonNull(responseEntityPlayerDatas.getBody());
 
         for (PlayerData playerData: playerDatas) {
             TypeTamagotchi typeTamagotchi =
@@ -114,7 +114,7 @@ public class PlayerController {
                         HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
                         });
 
-        List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
+        List<PlayerData> playerDatas = Objects.requireNonNull(responseEntityPlayerDatas.getBody());
 
         for (PlayerData playerData: playerDatas) {
             if (
