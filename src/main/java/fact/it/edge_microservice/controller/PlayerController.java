@@ -29,7 +29,7 @@ public class PlayerController {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private static final String URL_PROTOCOL = "http://";
+    private static final String URL_PROTOCOL = "https://";
     private static final String PATTERN_LETTERS_AND_DIGITS = "^[a-zA-Z0-9]+$";
     private static final String PATTERN_LETTERS = "^[a-zA-Z]+$";
 
@@ -47,12 +47,7 @@ public class PlayerController {
         List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
 
         for (PlayerData playerData: playerDatas) {
-
-            TypeTamagotchi typeTamagotchi =
-                    restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
-                            TypeTamagotchi.class, playerData.getTypeName());
-
-            Player playerToAdd = new Player(playerData, typeTamagotchi);
+            Player playerToAdd = getPlayerToAdd(playerData);
 
             returnList.add(playerToAdd);
         }
@@ -100,6 +95,36 @@ public class PlayerController {
                             TypeTamagotchi.class, playerData.getTypeName());
 
             returnList.add(new Player(playerData, typeTamagotchi));
+        }
+
+        return returnList;
+    }
+
+
+    // Get all players with a specific alive state (true | false)
+    @GetMapping("/players/alive/{alive}")
+    public List<Player> getPlayersByAliveState(@PathVariable Boolean alive){
+
+        List<Player> returnList = new ArrayList<>();
+
+        ResponseEntity<List<PlayerData>> responseEntityPlayerDatas =
+                restTemplate.exchange(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerDatas",
+                        HttpMethod.GET, null, new ParameterizedTypeReference<List<PlayerData>>() {
+                        });
+
+        List<PlayerData> playerDatas = responseEntityPlayerDatas.getBody();
+
+        for (PlayerData playerData: playerDatas) {
+            if (alive && playerData.getHealth() > 0) {
+                Player playerToAdd = getPlayerToAdd(playerData);
+
+                returnList.add(playerToAdd);
+            }
+            else if (!alive && playerData.getHealth() <= 0) {
+                Player playerToAdd = getPlayerToAdd(playerData);
+
+                returnList.add(playerToAdd);
+            }
         }
 
         return returnList;
@@ -175,5 +200,13 @@ public class PlayerController {
         restTemplate.delete(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerData/" + playerDataCode);
 
         return ResponseEntity.ok().build();
+    }
+
+    private Player getPlayerToAdd(PlayerData playerData) {
+        TypeTamagotchi typeTamagotchi =
+                restTemplate.getForObject(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/{typeName}",
+                        TypeTamagotchi.class, playerData.getTypeName());
+
+        return new Player(playerData, typeTamagotchi);
     }
 }

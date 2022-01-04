@@ -47,7 +47,7 @@ class PlayerControllerUnitTests {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private static final String URL_PROTOCOL = "http://";
+    private static final String URL_PROTOCOL = "https://";
 
     @Autowired
     private MockMvc mockMvc;
@@ -63,10 +63,12 @@ class PlayerControllerUnitTests {
     // --- PlayerData mock data ---
     private final PlayerData playerData1 = new PlayerData("12345abcde","Slijmie","Rimu Tempest",80,50, LocalDateTime.of(2017, 2, 13, 15, 56, 42),LocalDateTime.of(2017, 2, 13, 15, 56, 5),30);
     private final PlayerData playerData2 = new PlayerData("abcde12345","Slakkie","Slakkie Slak",70,60,LocalDateTime.of(2019, 3, 4, 15, 56, 12),LocalDateTime.of(2019, 3, 5, 15, 56, 35),40);
-    private final PlayerData playerData3 = new PlayerData("Fluffy12345","Fluffy","Fluffy Pluisbol",160,80, LocalDateTime.of(2021, 5, 12, 15, 35, 59),LocalDateTime.of(2021, 5, 12, 15, 35, 41),1);
+    private final PlayerData playerData3 = new PlayerData("Fluffy12345","Fluffy","Fluffy Pluisbol",0,80, LocalDateTime.of(2021, 5, 12, 15, 35, 59),LocalDateTime.of(2021, 5, 12, 15, 35, 41),1);
 
     List<PlayerData> playerDataList = Arrays.asList(playerData1, playerData2, playerData3);
     List<PlayerData> playerDataTypeSlijmieList = List.of(playerData1);
+    List<PlayerData> playerDataAliveTrueList = List.of(playerData1, playerData2);
+    List<PlayerData> playerDataAliveFalseList = List.of(playerData3);
 
     // --- TypeTamagotchi mock data ---
     private final TypeTamagotchi type1 = new TypeTamagotchi("Slijmie","Een slijmerig maar schattig dier",160,80,50,32,80,30);
@@ -101,7 +103,7 @@ class PlayerControllerUnitTests {
                         .body(mapper.writeValueAsString(type1))
                 );
 
-        // GET TypeTamagotchi with typeName 'Slijmie'
+        // GET TypeTamagotchi with typeName 'Slakkie'
         mockServer.expect(ExpectedCount.once(),
                         requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Slakkie")))
                 .andExpect(method(HttpMethod.GET))
@@ -110,7 +112,7 @@ class PlayerControllerUnitTests {
                         .body(mapper.writeValueAsString(type2))
                 );
 
-        // GET TypeTamagotchi with typeName 'Slijmie'
+        // GET TypeTamagotchi with typeName 'Fluffy'
         mockServer.expect(ExpectedCount.once(),
                         requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Fluffy")))
                 .andExpect(method(HttpMethod.GET))
@@ -176,7 +178,7 @@ class PlayerControllerUnitTests {
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.playerDataCode",is("Fluffy12345")))
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.typeName",is("Fluffy")))
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.name",is("Fluffy Pluisbol")))
-                .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.health",is(160)))
+                .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.health",is(0)))
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.happiness",is(80)))
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.lastFed",is("2021-05-12T15:35:59")))
                 .andExpect(jsonPath("$[2].playerTamagotchis[0].playerData.lastPetted",is("2021-05-12T15:35:41")))
@@ -285,6 +287,139 @@ class PlayerControllerUnitTests {
                 // type1 is correct
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.typeName",is("Slijmie")))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.description",is("Een slijmerig maar schattig dier")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.maxWeight",is(160)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minWeight",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHealth",is(50)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.neuroticism",is(32)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.metabolism",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)));
+    }
+
+
+    @Test
+    void whenGetPlayersAliveTrue_thenReturnPlayersJson() throws Exception {
+
+        // GET all playerData from playerDataCode '12345abcde'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerDatas")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playerDataList))
+                );
+
+        // GET TypeTamagotchi with typeName 'Slijmie'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Slijmie")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(type1))
+                );
+
+        // GET TypeTamagotchi with typeName 'Slakkie'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Slakkie")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(type2))
+                );
+
+        mockMvc.perform(get("/players/alive/true"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // Array length is correct
+                .andExpect(jsonPath("$", hasSize(2)))
+
+                // player1 is correct
+                .andExpect(jsonPath("$[0].name", is("Rimu Tempest")))
+                .andExpect(jsonPath("$[0].playerDataCode", is("12345abcde")))
+                // playerData1 is correct
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.playerDataCode",is("12345abcde")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.name",is("Rimu Tempest")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.health",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.happiness",is(50)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.lastFed",is("2017-02-13T15:56:42")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.lastPetted",is("2017-02-13T15:56:05")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.age",is(30)))
+                // type1 is correct
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.typeName",is("Slijmie")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.description",is("Een slijmerig maar schattig dier")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.maxWeight",is(160)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minWeight",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHealth",is(50)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.neuroticism",is(32)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.metabolism",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHappiness",is(30)))
+
+                // player2 is correct
+                .andExpect(jsonPath("$[1].name", is("Slakkie Slak")))
+                .andExpect(jsonPath("$[1].playerDataCode", is("abcde12345")))
+                // playerData2 is correct
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.playerDataCode",is("abcde12345")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.typeName",is("Slakkie")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.name",is("Slakkie Slak")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.health",is(70)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.happiness",is(60)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.lastFed",is("2019-03-04T15:56:12")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.lastPetted",is("2019-03-05T15:56:35")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].playerData.age",is(40)))
+                // type2 is correct
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.typeName",is("Slakkie")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.description",is("Een slak")))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.maxWeight",is(120)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.minWeight",is(70)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.minHealth",is(60)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.neuroticism",is(98)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.metabolism",is(120)))
+                .andExpect(jsonPath("$[1].playerTamagotchis[0].typeTamagotchi.minHappiness",is(40)));
+    }
+
+
+    @Test
+    void whenGetPlayersAliveFalse_thenReturnPlayersJson() throws Exception {
+
+        // GET all playerData from playerDataCode '12345abcde'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + playerDataServiceBaseUrl + "/playerDatas")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(playerDataList))
+                );
+
+        // GET TypeTamagotchi with typeName 'Fluffy'
+        mockServer.expect(ExpectedCount.once(),
+                        requestTo(new URI(URL_PROTOCOL + typeTamagotchiServiceBaseUrl + "/types/Fluffy")))
+                .andExpect(method(HttpMethod.GET))
+                .andRespond(withStatus(HttpStatus.OK)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(mapper.writeValueAsString(type3))
+                );
+
+        mockMvc.perform(get("/players/alive/false"))
+                .andExpect(content().contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                // Array length is correct
+                .andExpect(jsonPath("$", hasSize(1)))
+
+                // player3 is correct
+                .andExpect(jsonPath("$[0].name", is("Fluffy Pluisbol")))
+                .andExpect(jsonPath("$[0].playerDataCode", is("Fluffy12345")))
+                // playerData3 is correct
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.playerDataCode",is("Fluffy12345")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.typeName",is("Fluffy")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.name",is("Fluffy Pluisbol")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.health",is(0)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.happiness",is(80)))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.lastFed",is("2021-05-12T15:35:59")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.lastPetted",is("2021-05-12T15:35:41")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].playerData.age",is(1)))
+                // type3 is correct
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.typeName",is("Fluffy")))
+                .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.description",is("Een pluisbol")))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.maxWeight",is(160)))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minWeight",is(80)))
                 .andExpect(jsonPath("$[0].playerTamagotchis[0].typeTamagotchi.minHealth",is(50)))
