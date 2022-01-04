@@ -29,7 +29,7 @@ public class PlayerController {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private static final String URL_PROTOCOL = "https://";
+    private static final String URL_PROTOCOL = "http://";
     private static final String PATTERN_LETTERS_AND_DIGITS = "^[a-zA-Z0-9]+$";
     private static final String PATTERN_LETTERS = "^[a-zA-Z]+$";
 

@@ -47,7 +47,7 @@ class PlayerControllerUnitTests {
     @Value("${typetamagotchiservice.baseurl}")
     private String typeTamagotchiServiceBaseUrl;
 
-    private static final String URL_PROTOCOL = "https://";
+    private static final String URL_PROTOCOL = "http://";
 
     @Autowired
     private MockMvc mockMvc;
